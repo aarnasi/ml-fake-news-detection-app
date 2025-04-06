@@ -1,0 +1,6 @@
+gcp:
+  project_id: "ml-apps-sinni12"
+gcs:
+  bucket_name: "fake-news-sinni12"
+  model:
+    path: "models"

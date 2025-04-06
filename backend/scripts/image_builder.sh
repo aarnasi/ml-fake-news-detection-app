@@ -1,0 +1,1 @@
+docker build -t fake-news-detector-api:latest .
