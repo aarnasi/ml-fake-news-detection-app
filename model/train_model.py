@@ -10,6 +10,14 @@ import joblib  # For saving the trained model to a file
 # Import the custom data loading function
 from data_loader import load_and_prepare_data
 
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
 # --- Data Loading and Preparation ---
 
 # Load the dataset using the custom function and prepare it for modeling
@@ -29,10 +37,10 @@ y = df['label']    # Target variable (e.g., 'fake' or 'real')
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # --- Model Building (Pipeline) ---
+#The pipeline first transforms X_train using TfidfVectorizer and then trains LogisticRegression on the transformed
+# data and y_train.
 
 # Create a machine learning pipeline
-# A pipeline sequentially applies a list of transforms and a final estimator.
-# This makes the workflow cleaner and prevents data leakage from the test set during transformation.
 pipeline = Pipeline([
     # Step 1: TF-IDF Vectorizer
     # Converts text documents to a matrix of TF-IDF features.
@@ -42,35 +50,34 @@ pipeline = Pipeline([
 
     # Step 2: Logistic Regression Classifier
     # A linear model for classification.
-    # max_iter=1000: Increases the maximum number of iterations for the solver to converge, useful for complex datasets.
     ('clf', LogisticRegression(max_iter=1000))
 ])
 
 # --- Model Training ---
 
-# Train the entire pipeline (TF-IDF transformation and Logistic Regression) on the training data The pipeline first
-# transforms X_train using TfidfVectorizer and then trains LogisticRegression on the transformed data and y_train.
+# Train the entire pipeline (TF-IDF transformation and Logistic Regression) on the training data
+logging.info("Training model ..")
 pipeline.fit(X_train, y_train)
 
 # --- Model Evaluation ---
 
 # Make predictions on the unseen test data using the trained pipeline The pipeline automatically applies the same
 # TF-IDF transformation learned from the training data to X_test before predicting.
+logging.info("Evaluating model ..")
 y_pred = pipeline.predict(X_test)
 
 # Print a classification report to evaluate the model's performance
 # Compares the true labels (y_test) with the predicted labels (y_pred)
 # Shows metrics like precision, recall, F1-score, and support for each class.
-print("--- Classification Report ---")
-print(classification_report(y_test, y_pred))
-print("-----------------------------")
+logging.info("--- Classification Report ---")
+logging.info(classification_report(y_test, y_pred))
+logging.info("-----------------------------")
 
 # --- Model Saving ---
 
 # Save the trained pipeline (including the vectorizer and the classifier) to a file
 # This allows the model to be loaded and used later for predictions without retraining.
 # 'model/fake_news_model.pkl' is the path where the model file will be saved.
-joblib.dump(pipeline, 'backend/model/fake_news_model.pkl')
+joblib.dump(pipeline, 'saved_model/fake_news_model.pkl')
 
-# Print a confirmation message indicating that the model has been saved successfully.
-print("✅ Model saved to model/fake_news_model.pkl")
+logging.info("✅ Model saved to saved_model/fake_news_model.pkl")
