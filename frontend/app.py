@@ -11,7 +11,7 @@ text = st.text_area("Enter the news content:", height=200)
 if st.button("Detect"):
     if title and text:
         with st.spinner("Analyzing..."):
-            response = requests.post("https://locahost:8080", json={"title": title, "text": text})
+            response = requests.post("https://locahost:8000", json={"title": title, "text": text})
             if response.status_code == 200:
                 result = response.json()["prediction"]
                 if result==1:
